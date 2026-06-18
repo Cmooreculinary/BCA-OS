@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "conrad-mcp-bridge": {
+      "command": "python3",
+      "args": ["/Users/christopheramoore/dev/expo-os/mcp_bridge/mcp_server.py"],
+      "env": {
+        "MONGO_URI": "mongodb://localhost:27017",
+        "MONGO_DB": "expo_os",
+        "GOOGLE_API_KEY": "YOUR_GOOGLE_API_KEY",
+        "NOTEBOOKLM_NOTEBOOK_ID": "YOUR_NOTEBOOK_ID"
+      }
+    }
+  }
+}

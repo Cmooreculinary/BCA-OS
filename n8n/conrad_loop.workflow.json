@@ -1,0 +1,108 @@
+{
+  "name": "Conrad Loop Runner",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger-001",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.CONRAD_API_URL }}/conrad",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "task",
+              "value": "={{ $json.task || 'What are the latest operational insights in VaultSpace?' }}"
+            },
+            {
+              "name": "notebook_id",
+              "value": "={{ $env.NOTEBOOKLM_NOTEBOOK_ID }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "http-001",
+      "name": "Call Conrad /conrad",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Append a one-line dated lesson to memory.md content stored in this workflow.\n// In production, replace this with a File Write or GitHub node targeting memory.md.\nconst answer = $input.first().json.answer || '';\nconst vaultId = $input.first().json.vault_id || '';\nconst grounded = $input.first().json.grounded;\nconst today = new Date().toISOString().split('T')[0];\n\nconst lesson = `- [${today}] Loop ran. VaultSpace id: ${vaultId}. Grounded: ${grounded}. Excerpt: ${answer.slice(0, 120).replace(/\\n/g, ' ')}...`;\n\nreturn [{ json: { lesson, vaultId, grounded, answer } }];"
+      },
+      "id": "code-001",
+      "name": "Format Memory Lesson",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.CONRAD_API_URL }}/vault/write",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "source",
+              "value": "n8n-loop-runner"
+            },
+            {
+              "name": "content",
+              "value": "={{ $json.lesson }}"
+            },
+            {
+              "name": "tags",
+              "value": "[\"n8n\", \"memory-append\", \"auto\"]"
+            }
+          ]
+        }
+      },
+      "id": "http-002",
+      "name": "Write Lesson to VaultSpace",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { status: 'loop complete', vault_id: $json.inserted_id, lesson: $('Format Memory Lesson').first().json.lesson } }}"
+      },
+      "id": "respond-001",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1120, 300]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [[{ "node": "Call Conrad /conrad", "type": "main", "index": 0 }]]
+    },
+    "Call Conrad /conrad": {
+      "main": [[{ "node": "Format Memory Lesson", "type": "main", "index": 0 }]]
+    },
+    "Format Memory Lesson": {
+      "main": [[{ "node": "Write Lesson to VaultSpace", "type": "main", "index": 0 }]]
+    },
+    "Write Lesson to VaultSpace": {
+      "main": [[{ "node": "Respond", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": ["expo-os", "conrad", "loop-runner"]
+}

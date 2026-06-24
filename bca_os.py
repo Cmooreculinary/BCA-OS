@@ -71,6 +71,36 @@ BCA_APPS: dict[str, dict] = {
     },
 }
 
+# ---------------------------------------------------------------------------
+# BCA OS Brain Registry — all brains the OS knows about.
+# Conrad handles everything until a dedicated brain is built and registered.
+# ---------------------------------------------------------------------------
+
+BCA_BRAINS: dict[str, dict] = {
+    "conrad": {
+        "name": "Conrad/EXPO",
+        "scope": ["bca-company", "bca-apps", "agents", "host"],
+        "description": "First brain. Front door for Chef. Hosts all BCA until a "
+                       "dedicated brain exists for a domain.",
+        "status": "active",
+        "handles_until_built": ["personal", "staff"],
+    },
+    "personal": {
+        "name": "Personal Brain",
+        "scope": ["chef-personal", "calendar", "finance-personal", "life-ops"],
+        "description": "Chef's personal context, calendar, notes, and life ops.",
+        "status": "not-built",
+        "owner": "conrad",   # Conrad handles this domain until brain is live
+    },
+    "staff": {
+        "name": "Staff Brain",
+        "scope": ["team", "hr-adjacent", "scheduling", "comms"],
+        "description": "Team management, staff comms, scheduling, and HR-adjacent ops.",
+        "status": "not-built",
+        "owner": "conrad",
+    },
+}
+
 # Domain → default brain mapping
 DOMAIN_BRAIN: dict[str, str] = {
     "youth-nutrition":    "capkids",
@@ -153,6 +183,7 @@ class BCAOS:
         return {
             "os": "BCA OS v1.0",
             "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "brains": BCA_BRAINS,
             "apps": BCA_APPS,
             "vault_keys": list(self._vault.all().keys()),
             "providence_entries": len(self._providence_log),

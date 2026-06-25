@@ -1,11 +1,121 @@
 # BCA VaultSpace & NotebookLM Architecture
 
-**Source of truth — memory layer for the EXPO OS / Conrad brain.**
+**Source of truth — memory layer for BCA OS / Conrad.**
 Treat this as binding. Do not collapse or reroute these layers.
 
 ---
 
-## 1. The Two-Layer Memory Model
+## 1. BCA OS Hierarchy
+
+BCA OS is the single founder-controlled parent operating system. Conrad is the
+central brain beneath BCA OS: founder assistant, public host, voice, tour guide,
+EXPO traffic director, and universal intake router.
+
+Claude is not the parent brain. Claude is a tool or model Conrad may use.
+
+```
+BCA OS
+└── Conrad
+    ├── Companies
+    ├── Projects
+    ├── Products
+    ├── Apps
+    ├── Agents
+    ├── Staff
+    ├── Specialized brains
+    ├── Founder projects
+    └── Founder-private systems
+```
+
+---
+
+## 2. Canonical Memory Locations
+
+### A. Conrad Inbox
+
+Temporary intake location for unclassified information.
+
+Local folders:
+
+```
+~/BCA_OS_INBOX/new
+~/BCA_OS_INBOX/processing
+~/BCA_OS_INBOX/processed
+~/BCA_OS_INBOX/failed
+~/BCA_OS_INBOX/receipts
+```
+
+### B. Working Memory
+
+Location:
+
+```
+~/dev/expo-os/memory.md
+```
+
+Purpose: current context, temporary lessons, active priorities, and short-lived
+operating notes. This is not the permanent source of truth.
+
+### C. VaultSpace
+
+VaultSpace is the durable write and system-of-record layer. It is MongoDB-backed.
+
+Canonical collections:
+
+- `intake_items`
+- `audit_log`
+- `companies`
+- `projects`
+- `products`
+- `apps`
+- `agents`
+- `people`
+- `tasks`
+- `decisions`
+- `documents`
+- `ideas`
+- `research`
+- `communications`
+- `incidents`
+- `approvals`
+- `memory_log`
+
+### D. Project Sources of Truth
+
+The correct Git repository and approved project documentation remain
+authoritative for code, configuration, schemas, deployment files, tests, and
+technical plans.
+
+### E. NotebookLM Galaxies
+
+NotebookLM Galaxies are curated read and query layers created only from approved
+VaultSpace or project-source material. Galaxies are not primary write locations.
+
+### F. Founder Private Vault
+
+The Founder Private Vault is a separate founder-only encrypted location for
+personal information, sensitive strategy, financial information, legal
+information, confidential communications, and restricted projects.
+
+### G. Secrets Storage
+
+API keys, passwords, database credentials, OAuth tokens, and other secrets may
+only be stored in `.env` files, hosting environment variables, or a secret
+manager.
+
+Never store secrets in:
+
+- Git
+- `memory.md`
+- narrative VaultSpace records
+- NotebookLM Galaxies
+- logs
+- routing receipts
+- chat memory
+
+---
+
+## 3. Runtime Read/Write Model
 
 Conrad's memory is split across two distinct layers with a hard rule:
 
@@ -18,7 +128,7 @@ Conrad's memory is split across two distinct layers with a hard rule:
 
 ---
 
-## 2. VaultSpace (Write Layer)
+## 4. VaultSpace (Write Layer)
 
 ### What it is
 VaultSpace is the operational write store. Every result Conrad produces, every lesson learned, every loop output lands here first. It is MongoDB-backed and lives on Render alongside the FastAPI core.
@@ -46,19 +156,30 @@ VaultSpace is the operational write store. Every result Conrad produces, every l
 }
 ```
 
+**Collection: `intake_items`**
+Stores deterministic Conrad intake routing records. Content is redacted before
+storage when a likely secret is detected.
+
+**Collection: `audit_log`**
+Append-only routing decisions. It must never include raw secret values.
+
 ### Access pattern
 - **Write:** `POST /vault/write` on the MCP bridge (see §4).
 - **Read recent:** `GET /vault/recent?limit=N` — used for context injection before Conrad acts.
 - **Direct query:** `mongosh expo_os --eval "db.vaultspace.find().sort({ts:-1}).limit(5)"`
 
 ### Rules
-- Hot-path FastAPI routes do **not** write to VaultSpace in the synchronous path. VaultSpace writes are async, at the edges.
+- Deterministic intake may write `intake_items` and `audit_log` synchronously.
+- LLMs and agents do **not** sit in the intake hot path.
+- Guest/product hot-path routes do **not** call Galaxy or agent workflows synchronously.
 - Never route live Stripe keys or customer PII into VaultSpace content fields.
-- VaultSpace is the **only** runtime write target. NotebookLM Galaxies are read-only at runtime.
+- VaultSpace is the general operational runtime write target. NotebookLM Galaxies are read-only at runtime.
+- Founder-only material routes to the Founder Private Vault, not public project memory.
+- Secrets route to secret-manager-required quarantine, not narrative memory.
 
 ---
 
-## 3. NotebookLM Galaxies (Read / Recall Layer)
+## 5. NotebookLM Galaxies (Read / Recall Layer)
 
 ### What they are
 Galaxies are NotebookLM notebooks populated with curated source documents — architecture docs, session summaries, domain knowledge, operator playbooks. Conrad queries them for source-grounded, cited answers.
@@ -82,7 +203,7 @@ If a native NotebookLM MCP endpoint ships, replace `galaxy_client.py` with that 
 
 ---
 
-## 4. MCP Bridge (The Corpus Callosum)
+## 6. MCP Bridge (The Corpus Callosum)
 
 The MCP bridge is the only sanctioned path between Conrad and the memory layers. It runs as a FastAPI service on Render (port 8001 locally).
 
@@ -93,6 +214,9 @@ The MCP bridge is the only sanctioned path between Conrad and the memory layers.
 | `POST /galaxy/query` | Conrad → Galaxy | Source-grounded read with citations |
 | `POST /vault/write` | Conrad → VaultSpace | Write result or lesson |
 | `GET /vault/recent` | VaultSpace → Conrad | Recent context injection |
+| `POST /intake` | Conrad → VaultSpace audit | Deterministic intake classification, routing, and receipt |
+| `GET /intake/recent` | VaultSpace → Conrad | Recent intake records |
+| `GET /intake/{intake_id}` | VaultSpace → Conrad | One intake record |
 | `POST /conrad` | n8n → full loop | Query Galaxy + write VaultSpace in one call |
 
 ### MCP tools (for Claude Code / n8n direct use)
@@ -111,12 +235,12 @@ NOTEBOOKLM_NOTEBOOK_ID=corpora/<your-corpus-id>
 
 ---
 
-## 5. The Full Memory Data Flow
+## 7. The Full Memory Data Flow
 
 ```
                     ┌─────────────────────────────────┐
-                    │         EXPO OS / Conrad          │
-                    │   (executive layer, Sonnet 4.6)   │
+                    │         BCA OS / Conrad           │
+                    │   (central intake and routing)    │
                     └────────────┬────────────┬─────────┘
                                  │            │
                     query        │            │  write result / lesson
@@ -143,7 +267,7 @@ NOTEBOOKLM_NOTEBOOK_ID=corpora/<your-corpus-id>
 
 ---
 
-## 6. Working Memory (`memory.md`)
+## 8. Working Memory (`memory.md`)
 
 `memory.md` is Conrad's session-scoped working memory. It sits in the repo root and is read at every session start.
 
@@ -159,10 +283,15 @@ NOTEBOOKLM_NOTEBOOK_ID=corpora/<your-corpus-id>
 
 ---
 
-## 7. Invariants (Non-Negotiable)
+## 9. Invariants (Non-Negotiable)
 
-1. **VaultSpace = write only (at runtime).** Never read VaultSpace in the synchronous hot path — use `/vault/recent` for async context injection only.
-2. **Galaxies = read only (at runtime).** Population is an offline, manual, Teacher-blessed process.
-3. **MCP bridge is the only path.** Direct MongoDB calls from application code bypass the audit trail — don't do it except in the bridge itself.
-4. **No secrets in content fields.** Neither VaultSpace nor Galaxies should ever hold live API keys, Stripe credentials, or customer PII.
-5. **Agents at the edges.** The FastAPI hot path (guest flow, menu filter, ticket) never calls the MCP bridge synchronously. Galaxy queries and VaultSpace writes are async, advisory, or batch.
+1. **BCA OS is the parent.** Conrad is the central brain beneath BCA OS.
+2. **Conrad is universal intake.** Notes, files, ideas, decisions, instructions, bug reports, and tasks enter through Conrad and return a routing receipt.
+3. **VaultSpace = durable write layer.** Intake writes go to `intake_items`; routing decisions go to append-only `audit_log`.
+4. **Project sources remain authoritative.** Code, config, schemas, deployments, tests, and technical plans live in the correct Git repo and approved project docs.
+5. **Founder-only means founder-only.** Founder-private information routes to the Founder Private Vault.
+6. **Secrets never enter narrative memory.** Secret values do not go to Git, `memory.md`, VaultSpace content fields, Galaxies, logs, receipts, or chat memory.
+7. **No LLM in the intake hot path.** Intake classification starts with deterministic rules.
+8. **Galaxies = read only (at runtime).** Population is an offline, manual, Teacher-blessed process.
+9. **MCP bridge is the only path.** Direct MongoDB calls from application code bypass the audit trail; do not bypass it except in the bridge itself.
+10. **Agents at the edges.** Guest/product hot paths never call the MCP bridge synchronously. Galaxy queries and non-intake VaultSpace writes are async, advisory, or batch.

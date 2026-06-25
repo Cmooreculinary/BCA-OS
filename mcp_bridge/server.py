@@ -11,10 +11,22 @@ load_dotenv()
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from galaxy_client import galaxy_query
-from vaultspace import vault_write, vault_read_recent
+try:
+    from .galaxy_client import galaxy_query
+    from .intake import IntakeRequest, classify_and_route
+    from .vaultspace import (
+        intake_read,
+        intake_read_recent,
+        intake_store,
+        vault_read_recent,
+        vault_write,
+    )
+except ImportError:  # pragma: no cover - supports `python server.py` from mcp_bridge/
+    from galaxy_client import galaxy_query
+    from intake import IntakeRequest, classify_and_route
+    from vaultspace import intake_read, intake_read_recent, intake_store, vault_read_recent, vault_write
 
-app = FastAPI(title="Conrad MCP Bridge", version="0.1.0")
+app = FastAPI(title="Conrad MCP Bridge", version="0.2.0")
 
 
 class ConradRequest(BaseModel):
@@ -59,6 +71,41 @@ async def read_vault(limit: int = 10):
     try:
         entries = await vault_read_recent(limit)
         return {"entries": entries}
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=str(e))
+
+
+@app.post("/intake")
+async def create_intake(req: IntakeRequest):
+    """Deterministically classify and route a Conrad intake item."""
+    record, audit_record, receipt = classify_and_route(req)
+    try:
+        await intake_store(record, audit_record)
+        return receipt
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=str(e))
+
+
+@app.get("/intake/recent")
+async def read_recent_intake(limit: int = 10):
+    """Return recent Conrad intake records."""
+    try:
+        entries = await intake_read_recent(limit)
+        return {"entries": entries}
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=str(e))
+
+
+@app.get("/intake/{intake_id}")
+async def read_intake_item(intake_id: str):
+    """Return one Conrad intake record."""
+    try:
+        record = await intake_read(intake_id)
+        if record is None:
+            raise HTTPException(status_code=404, detail="intake item not found")
+        return record
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=502, detail=str(e))
 

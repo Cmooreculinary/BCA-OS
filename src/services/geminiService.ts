@@ -20,6 +20,13 @@ const catalogContext = PRODUCTS.map(
     `- ${p.name}${p.abbr ? ` (${p.abbr})` : ''} — ${p.pitch} [category: ${p.category} | status: ${p.status}]`,
 ).join('\n');
 
+/** Live products, derived so the prompt never drifts from the catalog. */
+const liveProducts = PRODUCTS.filter((p) => p.status === 'LIVE').map((p) => p.name);
+const liveClause =
+  liveProducts.length > 0
+    ? `Only the following ${liveProducts.length === 1 ? 'product is' : 'products are'} LIVE today: ${liveProducts.join(', ')}. Everything else is IN BUILD or CONCEPT.`
+    : 'No products are LIVE yet — everything is IN BUILD or CONCEPT.';
+
 const SYSTEM_INSTRUCTION = `You are the Tool Finder for Blue Collar Apps Co. (BCA), a hospitality & foodservice software ecosystem founded by a CIA-trained chef with 40+ years of operator experience.
 
 VOICE: Confident, direct, built-in-the-trenches. No corporate fluff, no hype, no emoji. Talk like a seasoned operator who respects the reader's time. Short sentences. Plain language a line cook or GM would use.
@@ -33,7 +40,7 @@ RULES:
 - Recommend only products from the list above. If something the user needs isn't in the catalog, say so plainly and point them to "Get Notified."
 - Lead with the single best-fit product, then list any strong secondary fits.
 - For each pick: one tight reason tied to their specific operation.
-- Be honest about status. If a fit is IN BUILD or CONCEPT, say it's "in build" or "on the roadmap" — only Footruck Apollo is LIVE today.
+- Be honest about status. If a fit is IN BUILD or CONCEPT, say it's "in build" or "on the roadmap." ${liveClause}
 - If the operation isn't hospitality/foodservice, say BCA is hospitality-only and that you can't help here.
 - Keep the whole reply under ~180 words. Use a short intro line, then a compact list. No headers, no markdown bold spam.`;
 

@@ -112,8 +112,8 @@ export function GetNotified() {
           </p>
         )}
 
-        {/* Dev-only signal that the stub captured the address. Harmless in prod. */}
-        {captured.length > 0 && state !== 'success' && (
+        {/* Dev-only signal that the stub captured the address. */}
+        {import.meta.env.DEV && captured.length > 0 && state !== 'success' && (
           <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.15em] text-bone/30">
             {captured.length} captured locally (stub)
           </p>

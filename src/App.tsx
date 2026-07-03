@@ -9,13 +9,18 @@ import { Footer } from './components/Footer';
 import { NAV_LINKS } from './data/nav';
 import { useActiveSection } from './hooks/useActiveSection';
 
+// Stable reference — hoisted so it isn't rebuilt each render (which would
+// otherwise re-run the IntersectionObserver in useActiveSection every time the
+// active section changes).
+const SECTION_IDS = NAV_LINKS.map((l) => l.id);
+
 /**
  * Single-page app shell. Sections are rendered in order; the sticky nav tracks
  * the active section via IntersectionObserver, and in-page anchor links + CSS
  * `scroll-smooth` handle the "section routing."
  */
 export default function App() {
-  const activeId = useActiveSection(NAV_LINKS.map((l) => l.id));
+  const activeId = useActiveSection(SECTION_IDS);
 
   return (
     <div className="grain relative min-h-screen bg-obsidian">

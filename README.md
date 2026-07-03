@@ -60,6 +60,23 @@ src/
 context. Edit the catalog there and both stay in sync — the AI can only recommend products that
 exist in that array.
 
+## Security — API key handling
+
+Vite's `define` inlines `GEMINI_API_KEY` into the client bundle at build time, so
+**any key present in a deployed build is publicly extractable** from the browser
+JavaScript. This is inherent to the AI Studio single-page model, where the key is
+injected client-side.
+
+For local dev and AI Studio previews this is fine. Before a **public production
+deploy**, do one of:
+
+- **Recommended:** proxy the Tool Finder request through a server-side function
+  (edge/serverless) so the key stays server-side. `recommendTools()` in
+  `src/services/geminiService.ts` is the single call site to repoint at that
+  endpoint.
+- **At minimum:** use a **restricted, quota-capped** AI Studio key that is
+  **rotated regularly**, so a leaked key has limited blast radius.
+
 ## Notes / next steps
 
 - **Get Notified** is a front-end stub: it stores emails in local state and shows a success

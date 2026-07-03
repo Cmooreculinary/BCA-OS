@@ -44,7 +44,7 @@ export function Navbar({ activeId }: NavbarProps) {
               <li key={link.id}>
                 <a
                   href={`#${link.id}`}
-                  aria-current={isActive ? 'true' : undefined}
+                  aria-current={isActive ? 'location' : undefined}
                   className={`relative font-mono text-xs uppercase tracking-[0.18em] transition-colors ${
                     isActive ? 'text-fire' : 'text-bone/60 hover:text-bone'
                   }`}
@@ -97,6 +97,8 @@ export function Navbar({ activeId }: NavbarProps) {
       {/* Mobile drawer */}
       <div
         id="mobile-menu"
+        aria-hidden={!menuOpen}
+        inert={!menuOpen}
         className={`overflow-hidden border-t border-bone/10 bg-obsidian/95 backdrop-blur lg:hidden ${
           menuOpen ? 'max-h-96' : 'max-h-0'
         } transition-[max-height] duration-300 ease-in-out`}

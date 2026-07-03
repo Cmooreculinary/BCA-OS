@@ -183,6 +183,7 @@ export function ToolFinder() {
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="e.g. I run a 12-truck food truck fleet…"
                   autoComplete="off"
+                  maxLength={300}
                   disabled={loading}
                   className="flex-1 border border-bone/15 bg-obsidian px-4 py-3 font-body text-sm text-bone placeholder:text-bone/35 focus:border-fire"
                 />

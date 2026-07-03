@@ -103,7 +103,9 @@ export async function recommendTools(operation: string): Promise<string> {
     return text;
   } catch (err) {
     if (err instanceof ToolFinderError) throw err;
-    // Network / quota / model errors land here.
+    // Network / quota / model errors land here. Log the original for
+    // debuggability; surface a friendly message to the user.
+    console.error('[ToolFinder] recommendTools failed:', err);
     throw new ToolFinderError(
       "Couldn't reach the Tool Finder right now. Give it another shot in a moment.",
     );

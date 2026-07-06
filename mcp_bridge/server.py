@@ -43,6 +43,38 @@ class VaultWriteRequest(BaseModel):
     tags: list[str] = []
 
 
+class ChatRequest(BaseModel):
+    message: str
+    history: list[dict] = []
+
+
+_CONRAD_SYSTEM = """You are Conrad — the central brain beneath BCA OS, named for Conrad Hilton.
+
+You serve Christopher Moore, founder of Blue Collar Apps Co. (BCA). BCA builds software for operators in the field: restaurant managers, venue staff, food truck owners. Philosophy: Trench Design — software built bottom-up from operator experience.
+
+BCA OS hierarchy: BCA OS → Conrad → Companies, Projects, Products, Apps, Agents, Staff, Specialized brains, Founder projects, Founder-private systems.
+
+Active BCA projects:
+- Round Table: venue/restaurant management (Emergent, Iteration 18+)
+- Verdict AI: five-chamber AI judgment system (Emergent/FastAPI)
+- Captain Culinary Kids (CapKids): youth culinary education, AWANA pitch
+- Smoky Top: luxury home construction platform
+- FuseBox 2.0: Forge design system (Emergent)
+- BrainForge: private banking/Bloomberg aesthetic (Vercel)
+- Maestro + Vaultspace: life management bundle, Smart Inbox pipeline
+- Hemispheres: Democrat-Republican fact-checker (HTML/JS)
+- Food Truck Launchpad: agent fleet reference architecture (TBD)
+- DUSK, Valet Captain, PUBHUB, PLATE ME, Foxhounds: consumer apps (TBD)
+
+Infrastructure: FastAPI + SQLite (deterministic flows), MongoDB (primary DB), Stripe (payments), Emergent (AI-native app platform), Vercel (frontend), n8n (orchestration), NotebookLM Galaxies (recall), VaultSpace (write memory).
+
+Delegation law: judgment/planning/identity → you. Instant deterministic flows → FastAPI. Memory write → VaultSpace. Action/orchestration → n8n. Heavy coding → GLM-5.2 (never give it secrets). Architecture review → Opus 4.8.
+
+Your role: answer questions, discuss BCA strategy, think through decisions, serve as the founder's thinking partner. Be direct, concise, and practical — no fluff. You are a force multiplier, not a replacement.
+
+Guardrails: never route live Stripe keys or customer data through third-party cloud LLMs. Hot-path stays deterministic. Agents live at the edges only."""
+
+
 _UI = """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -81,6 +113,17 @@ _UI = """<!DOCTYPE html>
   .status-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#5ddb9a;margin-right:6px;vertical-align:middle}
   #status-bar{font-size:11px;color:#555;margin-top:6px}
   #error{color:#db5d5d;font-size:12px;margin-top:8px;display:none}
+  .chat-wrap{margin-top:24px;max-width:1100px}
+  .chat-messages{height:340px;overflow-y:auto;background:#0a0a0a;border:1px solid #1e1e1e;border-radius:4px;padding:12px;margin-bottom:10px}
+  .msg{margin-bottom:14px;font-size:13px;line-height:1.6}
+  .msg.user{text-align:right}
+  .msg.user .bubble{display:inline-block;background:#1a2a1e;border:1px solid #2a5c45;border-radius:6px 6px 0 6px;padding:8px 12px;color:#e8e8e8;max-width:80%;text-align:left;white-space:pre-wrap}
+  .msg.assistant .bubble{display:inline-block;background:#111;border:1px solid #222;border-radius:6px 6px 6px 0;padding:8px 12px;color:#c8c8c8;max-width:80%;white-space:pre-wrap}
+  .msg.assistant .name{font-size:10px;color:#5ddb9a;margin-bottom:4px;letter-spacing:.1em;text-transform:uppercase}
+  .chat-input-row{display:flex;gap:10px;align-items:flex-end}
+  .chat-input-row textarea{flex:1;min-height:52px;resize:vertical}
+  #chat-send{padding:12px 20px;align-self:flex-end}
+  #chat-thinking{font-size:11px;color:#555;margin-top:6px;min-height:16px}
 </style>
 </head>
 <body>
@@ -108,6 +151,22 @@ _UI = """<!DOCTYPE html>
       <button onclick="loadRecent()" style="font-size:11px;padding:4px 10px">Refresh</button>
     </div>
     <div id="recent"><span style="color:#444;font-size:12px">Loading...</span></div>
+  </div>
+</div>
+<div class="chat-wrap">
+  <div class="card">
+    <h2>Talk to Conrad</h2>
+    <div id="chat-messages" class="chat-messages">
+      <div class="msg assistant">
+        <div class="name">Conrad</div>
+        <div class="bubble">Hello, Christopher. I&#x27;m Conrad &#x2014; the BCA OS brain. Ask me anything about the portfolio, strategy, routing, or what to build next.</div>
+      </div>
+    </div>
+    <div class="chat-input-row">
+      <textarea id="chat-input" placeholder="Ask Conrad anything..." rows="2"></textarea>
+      <button id="chat-send" class="primary" onclick="sendMessage()">Send</button>
+    </div>
+    <div id="chat-thinking"></div>
   </div>
 </div>
 <script>
@@ -184,6 +243,56 @@ async function loadRecent() {
 document.getElementById('content').addEventListener('keydown', e => {
   if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') submitIntake();
 });
+
+document.getElementById('chat-input').addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') sendMessage();
+});
+
+let chatHistory = [];
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function appendMsg(role, text) {
+  const el = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  if (role === 'assistant') {
+    div.innerHTML = '<div class="name">Conrad</div><div class="bubble">' + escapeHtml(text) + '</div>';
+  } else {
+    div.innerHTML = '<div class="bubble">' + escapeHtml(text) + '</div>';
+  }
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  const btn = document.getElementById('chat-send');
+  const thinking = document.getElementById('chat-thinking');
+  appendMsg('user', msg);
+  input.value = '';
+  btn.disabled = true;
+  thinking.textContent = 'Conrad is thinking...';
+  try {
+    const res = await fetch(API + '/chat', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({message: msg, history: chatHistory})
+    });
+    if (!res.ok) throw new Error(await res.text());
+    const r = await res.json();
+    chatHistory = r.history;
+    appendMsg('assistant', r.reply);
+  } catch(e) {
+    appendMsg('assistant', 'Error: ' + e.message);
+  }
+  thinking.textContent = '';
+  btn.disabled = false;
+}
 
 loadRecent();
 </script>
@@ -287,6 +396,36 @@ async def conrad_loop(req: ConradRequest):
             "grounded": galaxy_result["grounded"],
             "vault_id": vault_id,
         }
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=str(e))
+
+
+@app.post("/chat")
+async def chat(req: ChatRequest):
+    """Conrad conversational AI — multi-turn chat backed by Claude Opus 4.8."""
+    import asyncio
+    import anthropic
+
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        raise HTTPException(status_code=503, detail="ANTHROPIC_API_KEY not configured")
+
+    def _call():
+        client = anthropic.Anthropic(api_key=api_key)
+        messages = req.history + [{"role": "user", "content": req.message}]
+        response = client.messages.create(
+            model="claude-opus-4-8",
+            max_tokens=4096,
+            thinking={"type": "adaptive"},
+            system=_CONRAD_SYSTEM,
+            messages=messages,
+        )
+        reply = next((b.text for b in response.content if b.type == "text"), "")
+        updated_history = messages + [{"role": "assistant", "content": reply}]
+        return {"reply": reply, "history": updated_history}
+
+    try:
+        return await asyncio.to_thread(_call)
     except Exception as e:
         raise HTTPException(status_code=502, detail=str(e))
 

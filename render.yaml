@@ -17,6 +17,8 @@ services:
         value: /tmp/expo_os.sqlite3
       - key: SQLITE_DB
         value: expo_os
+      - key: ANTHROPIC_API_KEY
+        sync: false
     # For VaultSpace data that survives deploys, attach a persistent disk (paid)
     # and point SQLITE_PATH at it, e.g. /var/data/expo_os.sqlite3
     # disk:

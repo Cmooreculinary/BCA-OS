@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: bca-os
+    name: BCA-OS Founders
     runtime: python
     plan: starter
     buildCommand: pip install -r mcp_bridge/requirements.txt

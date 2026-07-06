@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: bca-os
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r mcp_bridge/requirements.txt
+    startCommand: uvicorn mcp_bridge.server:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: NOTEBOOKLM_NOTEBOOK_ID
+        sync: false
+      - key: SQLITE_PATH
+        value: /tmp/expo_os.sqlite3
+      - key: SQLITE_DB
+        value: expo_os
+    # For VaultSpace data that survives deploys, attach a persistent disk (paid)
+    # and point SQLITE_PATH at it, e.g. /var/data/expo_os.sqlite3
+    # disk:
+    #   name: expo-os-vault
+    #   mountPath: /var/data
+    #   sizeGB: 1

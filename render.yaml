@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: bca-os
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: ANTHROPIC_API_KEY
+        sync: false # set in the Render dashboard; required for chat/expedite
+      - key: BCA_VAULT_PATH
+        value: /tmp/bca_vault.json
+    # For Vault memory that survives deploys, attach a persistent disk
+    # (paid plans) and point BCA_VAULT_PATH at it, e.g.:
+    # disk:
+    #   name: bca-vault
+    #   mountPath: /var/data
+    #   sizeGB: 1
+    # and set BCA_VAULT_PATH=/var/data/bca_vault.json

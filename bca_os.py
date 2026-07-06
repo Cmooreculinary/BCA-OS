@@ -144,8 +144,26 @@ class RoutingDecision:
 class BCAOS:
     def __init__(self, vault_path: Path):
         self._vault = Vault(vault_path)
-        self._client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+        self._client: anthropic.Anthropic | None = None
         self._providence_log: list[dict] = []
+
+    @property
+    def client(self) -> anthropic.Anthropic:
+        # Lazy so the OS can boot (status, policy, vault) without a key;
+        # only dispatch requires it.
+        if self._client is None:
+            api_key = os.environ.get("ANTHROPIC_API_KEY")
+            if not api_key:
+                raise RuntimeError(
+                    "ANTHROPIC_API_KEY is not set. Set it in the environment "
+                    "(on Render: dashboard → Environment) to enable dispatch."
+                )
+            self._client = anthropic.Anthropic(api_key=api_key)
+        return self._client
+
+    @staticmethod
+    def api_key_configured() -> bool:
+        return bool(os.environ.get("ANTHROPIC_API_KEY"))
 
     # ---- catalog / status --------------------------------------------------
 
@@ -156,6 +174,7 @@ class BCAOS:
             "apps": BCA_APPS,
             "vault_keys": list(self._vault.all().keys()),
             "providence_entries": len(self._providence_log),
+            "api_key_configured": self.api_key_configured(),
         }
 
     # ---- policy / launch gates ---------------------------------------------
@@ -227,7 +246,7 @@ class BCAOS:
         else:
             model = decision.model
 
-        response = self._client.messages.create(
+        response = self.client.messages.create(
             model=model,
             max_tokens=max_tokens,
             system=system,

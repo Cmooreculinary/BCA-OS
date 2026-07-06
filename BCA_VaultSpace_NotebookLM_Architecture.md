@@ -58,7 +58,7 @@ operating notes. This is not the permanent source of truth.
 
 ### C. VaultSpace
 
-VaultSpace is the durable write and system-of-record layer. It is MongoDB-backed.
+VaultSpace is the durable write and system-of-record layer. It is SQLite-backed.
 
 Canonical collections:
 
@@ -121,7 +121,7 @@ Conrad's memory is split across two distinct layers with a hard rule:
 
 | Layer | System | Role | Direction |
 |---|---|---|---|
-| **Write / Store** | VaultSpace (MongoDB) | Operational results, lessons, loop outputs, audit trail | Conrad → VaultSpace |
+| **Write / Store** | VaultSpace (SQLite) | Operational results, lessons, loop outputs, audit trail | Conrad → VaultSpace |
 | **Read / Recall** | NotebookLM Galaxies | Long-term source-grounded knowledge, cited answers | Conrad ← Galaxies |
 
 **The invariant:** Conrad writes to VaultSpace. Conrad reads from Galaxies. VaultSpace is never a Galaxy source at runtime — it feeds Galaxies offline during population cycles. Galaxies are never written to at runtime.
@@ -131,9 +131,9 @@ Conrad's memory is split across two distinct layers with a hard rule:
 ## 4. VaultSpace (Write Layer)
 
 ### What it is
-VaultSpace is the operational write store. Every result Conrad produces, every lesson learned, every loop output lands here first. It is MongoDB-backed and lives on Render alongside the FastAPI core.
+VaultSpace is the operational write store. Every result Conrad produces, every lesson learned, every loop output lands here first. It is SQLite-backed and lives on Render alongside the FastAPI core.
 
-### MongoDB schema
+### SQLite schema
 
 **Collection: `vaultspace`**
 ```json
@@ -166,7 +166,7 @@ Append-only routing decisions. It must never include raw secret values.
 ### Access pattern
 - **Write:** `POST /vault/write` on the MCP bridge (see §4).
 - **Read recent:** `GET /vault/recent?limit=N` — used for context injection before Conrad acts.
-- **Direct query:** `mongosh expo_os --eval "db.vaultspace.find().sort({ts:-1}).limit(5)"`
+- **Direct query:** `sqlite3 mcp_bridge/data/expo_os.sqlite3 "select document_json from documents where collection_name='vaultspace' order by updated_at desc limit 5;"`
 
 ### Rules
 - Deterministic intake may write `intake_items` and `audit_log` synchronously.
@@ -227,8 +227,8 @@ The MCP bridge is the only sanctioned path between Conrad and the memory layers.
 ### Config
 Copy `mcp_bridge/claude_mcp_config.json` into your Claude Code MCP settings. Set env vars:
 ```
-MONGO_URI=mongodb://localhost:27017
-MONGO_DB=expo_os
+SQLITE_PATH=./mcp_bridge/data/expo_os.sqlite3
+SQLITE_DB=expo_os
 GOOGLE_API_KEY=<your key>
 NOTEBOOKLM_NOTEBOOK_ID=corpora/<your-corpus-id>
 ```
@@ -246,7 +246,7 @@ NOTEBOOKLM_NOTEBOOK_ID=corpora/<your-corpus-id>
                     query        │            │  write result / lesson
                                  ▼            ▼
               ┌──────────────────────┐   ┌─────────────────────────┐
-              │  NotebookLM Galaxies │   │  VaultSpace (MongoDB)   │
+              │  NotebookLM Galaxies │   │  VaultSpace (SQLite)    │
               │  (read-only, cited)  │   │  collection: vaultspace  │
               └──────────┬───────────┘   └──────────┬──────────────┘
                          │                          │
@@ -293,5 +293,5 @@ NOTEBOOKLM_NOTEBOOK_ID=corpora/<your-corpus-id>
 6. **Secrets never enter narrative memory.** Secret values do not go to Git, `memory.md`, VaultSpace content fields, Galaxies, logs, receipts, or chat memory.
 7. **No LLM in the intake hot path.** Intake classification starts with deterministic rules.
 8. **Galaxies = read only (at runtime).** Population is an offline, manual, Teacher-blessed process.
-9. **MCP bridge is the only path.** Direct MongoDB calls from application code bypass the audit trail; do not bypass it except in the bridge itself.
+9. **MCP bridge is the only path.** Direct SQLite calls from application code bypass the audit trail; do not bypass it except in the bridge itself.
 10. **Agents at the edges.** Guest/product hot paths never call the MCP bridge synchronously. Galaxy queries and non-intake VaultSpace writes are async, advisory, or batch.

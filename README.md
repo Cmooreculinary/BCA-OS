@@ -23,7 +23,7 @@ BCA OS
 
 Conrad receives notes, files, ideas, decisions, instructions, bug reports, and
 tasks. The Phase 1 intake path is deterministic: classify, infer destination,
-redact likely secrets, store the intake record in MongoDB, append an audit
+redact likely secrets, store the intake record in SQLite, append an audit
 record, and return a routing receipt.
 
 ## Memory Locations
@@ -32,7 +32,7 @@ record, and return a routing receipt.
 - Working Memory: `~/dev/expo-os/memory.md` for current context, temporary lessons,
   active priorities, and short-lived operating notes. It is not the permanent
   source of truth.
-- VaultSpace: MongoDB durable write layer and system of record. Collections:
+- VaultSpace: SQLite durable write layer and system of record. Collections:
   `intake_items`, `audit_log`, `companies`, `projects`, `products`, `apps`,
   `agents`, `people`, `tasks`, `decisions`, `documents`, `ideas`, `research`,
   `communications`, `incidents`, `approvals`, and `memory_log`.
@@ -46,7 +46,7 @@ record, and return a routing receipt.
 
 ## Startup
 
-MongoDB is required for live `/intake` storage and retrieval.
+SQLite is required for live `/intake` storage and retrieval.
 
 ```bash
 cd ~/dev/expo-os/mcp_bridge
@@ -58,8 +58,8 @@ uvicorn server:app --host 127.0.0.1 --port 8001
 Expected `.env` values:
 
 ```bash
-MONGO_URI=mongodb://localhost:27017
-MONGO_DB=expo_os
+SQLITE_PATH=./mcp_bridge/data/expo_os.sqlite3
+SQLITE_DB=expo_os
 GOOGLE_API_KEY=your_google_api_key_here
 NOTEBOOKLM_NOTEBOOK_ID=your_notebook_id_here
 PORT=8001
@@ -154,20 +154,20 @@ status.
 
 ## Troubleshooting
 
-Check MongoDB:
+Check SQLite:
 
 ```bash
-mongosh --eval 'db.runCommand({ ping: 1 })'
+sqlite3 mcp_bridge/data/expo_os.sqlite3 'select 1;'
 ```
 
 Check intake collections:
 
 ```bash
-mongosh expo_os --eval 'db.intake_items.find().sort({timestamp:-1}).limit(5)'
-mongosh expo_os --eval 'db.audit_log.find().sort({timestamp:-1}).limit(5)'
+sqlite3 mcp_bridge/data/expo_os.sqlite3 "select document_json from documents where collection_name='intake_items' order by updated_at desc limit 5;"
+sqlite3 mcp_bridge/data/expo_os.sqlite3 "select document_json from documents where collection_name='audit_log' order by updated_at desc limit 5;"
 ```
 
-Run unit tests without MongoDB:
+Run unit tests without SQLite persistence:
 
 ```bash
 cd ~/dev/expo-os

@@ -35,7 +35,7 @@ async def list_tools() -> list[Tool]:
         ),
         Tool(
             name="vault_write",
-            description="Write a result or lesson to VaultSpace (MongoDB). Returns inserted doc id.",
+            description="Write a result or lesson to VaultSpace (SQLite). Returns inserted doc id.",
             inputSchema={
                 "type": "object",
                 "properties": {

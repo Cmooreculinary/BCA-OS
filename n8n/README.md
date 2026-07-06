@@ -27,7 +27,7 @@ Add to the `docker run` command (or n8n Settings → Environment):
 ## 4. Start the MCP bridge
 
 ```bash
-cd /Users/christopheramoore/dev/expo-os/mcp_bridge
+cd /Users/christopheramoore/Desktop/Applications/expo-os/mcp_bridge
 pip install -r requirements.txt
 cp .env.example .env   # fill in your keys
 uvicorn server:app --port 8001
@@ -37,4 +37,4 @@ uvicorn server:app --port 8001
 
 Trigger manually in n8n UI, or fire via webhook.
 The loop: Manual Trigger → /conrad → Format lesson → Write to VaultSpace → Respond.
-Check VaultSpace writes: `mongosh expo_os --eval "db.vaultspace.find().sort({ts:-1}).limit(5)"`
+Check VaultSpace writes: `sqlite3 mcp_bridge/data/expo_os.sqlite3 "select document_json from documents where collection_name='vaultspace' order by updated_at desc limit 5;"`

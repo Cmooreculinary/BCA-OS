@@ -2,12 +2,12 @@
   "mcpServers": {
     "conrad-mcp-bridge": {
       "command": "python3",
-      "args": ["/Users/christopheramoore/dev/expo-os/mcp_bridge/mcp_server.py"],
+      "args": ["/Users/christopheramoore/Desktop/Applications/expo-os/mcp_bridge/mcp_server.py"],
       "env": {
-        "MONGO_URI": "mongodb://localhost:27017",
-        "MONGO_DB": "expo_os",
-        "GOOGLE_API_KEY": "YOUR_GOOGLE_API_KEY",
-        "NOTEBOOKLM_NOTEBOOK_ID": "YOUR_NOTEBOOK_ID"
+        "SQLITE_PATH": "./data/expo_os.sqlite3",
+        "SQLITE_DB": "expo_os",
+        "GOOGLE_API_KEY": "AIzaSyDLClgL98tsGCr0cme4qvpjJoXFIJv5bwc",
+        "NOTEBOOKLM_NOTEBOOK_ID": "your_notebook_id_here"
       }
     }
   }

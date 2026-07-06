@@ -30,7 +30,7 @@ BCA OS
 
 ## Who does what (delegation law)
 - Judgment / planning / identity → me (best affordable model).
-- Instant deterministic flows → FastAPI + MongoDB. I never sit in that loop.
+- Instant deterministic flows → FastAPI + SQLite. I never sit in that loop.
 - Memory: write→VaultSpace, recall→NotebookLM Galaxies, working→memory.md.
 - Action/orchestration → n8n.
 - Heavy coding → GLM-5.2 (never give it secrets).

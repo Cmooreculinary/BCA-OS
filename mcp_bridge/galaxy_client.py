@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 Galaxy client — read/query layer for NotebookLM notebooks.
 

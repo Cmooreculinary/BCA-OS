@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 MCP Bridge — FastAPI service exposing Conrad's Galaxy (read) + VaultSpace (write) tools.
 
@@ -57,7 +59,7 @@ async def query_galaxy(req: ConradRequest):
 
 @app.post("/vault/write")
 async def write_vault(req: VaultWriteRequest):
-    """Write a result to VaultSpace (MongoDB). Returns the inserted document id."""
+    """Write a result to VaultSpace (SQLite). Returns the inserted document id."""
     try:
         doc_id = await vault_write(req.source, req.content, req.tags)
         return {"inserted_id": doc_id}

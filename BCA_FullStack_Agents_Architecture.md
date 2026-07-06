@@ -47,7 +47,7 @@ a routing receipt.
 - Conrad Inbox: temporary intake folders for unclassified information.
 - Working Memory: `~/dev/expo-os/memory.md`, used for current context and
   short-lived operating notes.
-- VaultSpace: MongoDB-backed durable write and system-of-record layer.
+- VaultSpace: SQLite-backed durable write and system-of-record layer.
 - Project Sources of Truth: approved repositories and project documentation.
 - NotebookLM Galaxies: curated read/query layers, never primary write locations.
 - Founder Private Vault: founder-only encrypted location for sensitive personal,

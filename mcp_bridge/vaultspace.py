@@ -1,7 +1,15 @@
-"""VaultSpace write layer — MongoDB-backed. Conrad writes here; never to NotebookLM."""
+from __future__ import annotations
+
+"""VaultSpace write layer — SQLite-backed. Conrad writes here; never to NotebookLM."""
 import os
+from pathlib import Path
 from datetime import datetime, timezone
 from typing import Any
+
+try:
+    from .sqlite_motor import AsyncSQLiteClient
+except ImportError:  # pragma: no cover - supports `python server.py` from mcp_bridge/
+    from sqlite_motor import AsyncSQLiteClient
 
 _client: Any | None = None
 
@@ -9,10 +17,9 @@ _client: Any | None = None
 def _db():
     global _client
     if _client is None:
-        from motor.motor_asyncio import AsyncIOMotorClient
-
-        _client = AsyncIOMotorClient(os.environ["MONGO_URI"])
-    return _client[os.environ.get("MONGO_DB", "expo_os")]
+        default_path = Path(__file__).parent / "data" / "expo_os.sqlite3"
+        _client = AsyncSQLiteClient(os.environ.get("SQLITE_PATH", str(default_path)))
+    return _client[os.environ.get("SQLITE_DB", "expo_os")]
 
 
 async def vault_write(source: str, content: str, tags: list[str] | None = None) -> str:
@@ -41,7 +48,7 @@ async def intake_store(record: dict, audit_record: dict) -> None:
 
 
 async def intake_read_recent(limit: int = 10) -> list[dict]:
-    """Return recent Conrad intake records without Mongo ObjectIds."""
+    """Return recent Conrad intake records without internal storage ids."""
     cursor = _db()["intake_items"].find({}, {"_id": 0}).sort("timestamp", -1).limit(limit)
     return await cursor.to_list(length=limit)
 

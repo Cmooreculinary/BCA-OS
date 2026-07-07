@@ -5,6 +5,18 @@ central brain beneath BCA OS: founder assistant, public host, voice, tour guide,
 EXPO traffic director, and universal intake router. Claude and other models are
 tools Conrad may use; they are not the parent brain.
 
+## Canonical Umbrella Story
+
+The current Blue Collar Apps umbrella story now lives in this repo:
+
+- `catalog/umbrella-story.md` — narrative source of truth for BC SOS / BCA OS,
+  Conrad, memory, credit ledger, app fleet, and agent fleet.
+- `catalog/ecosystem.json` — machine-readable canonical catalog for apps and
+  agents.
+
+`Blue-Collar-Apps-Founders` is the active public website/presentation layer.
+`Blue-Collar-Appz` is retired after useful lead-capture/API pieces are salvaged.
+
 ## Architecture Summary
 
 ```

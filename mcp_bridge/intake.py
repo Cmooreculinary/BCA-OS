@@ -48,8 +48,9 @@ SECRET_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
 
 PROJECT_ALIASES: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("Venue IQ", ("venue iq", "venue-iq", "venueiq")),
+    ("Margin IQ", ("margin iq", "margin-iq", "marginiq")),
     ("Foodtruck Apollo", ("foodtruck apollo", "footruck apollo", "food truck apollo", "apollo checkout")),
-    ("BCA OS", ("bca os", "expo os", "conrad", "vaultspace", "notebooklm", "notebook lm")),
+    ("BCA OS", ("bca os", "bc sos", "expo os", "conrad", "vaultspace", "notebooklm", "notebook lm")),
 )
 
 

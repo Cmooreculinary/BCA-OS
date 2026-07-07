@@ -59,6 +59,17 @@ class IntakeEndpointTests(unittest.TestCase):
         self.assertRegex(destination, r"ideas|product backlog")
         self.assertTrue(receipt["approval_required"])
 
+    def test_margin_iq_product_idea_routes_to_ideas_and_backlog(self):
+        receipt = self.post_intake(
+            "Margin IQ should alert the operator when labor percentage is drifting above target."
+        )
+
+        self.assertEqual(receipt["classification"], "product_feature_idea")
+        self.assertEqual(receipt["project"], "Margin IQ")
+        destination = f"{receipt['primary_destination']} {receipt['secondary_destination']}"
+        self.assertRegex(destination, r"ideas|product backlog")
+        self.assertTrue(receipt["approval_required"])
+
     def test_technical_bug_routes_to_issue_queue_and_incidents(self):
         receipt = self.post_intake("Foodtruck Apollo checkout returns a 500 error after Stripe payment.")
 

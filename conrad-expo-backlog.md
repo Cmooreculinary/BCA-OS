@@ -21,6 +21,8 @@
 - [x] Add SQLite persistence helpers for `intake_items` and append-only `audit_log`
 - [x] Add `GET /intake/recent` and `GET /intake/{intake_id}`
 - [x] Add unit tests for Venue IQ product idea, Foodtruck Apollo bug, founder-private note, staff task, fake API key quarantine, and intake retrieval
+- [x] Promote latest umbrella story into `catalog/umbrella-story.md` and `catalog/ecosystem.json`
+- [x] Add Margin IQ intake alias and routing test
 
 ## Phase 2 — Conrad Intake Expansion
 

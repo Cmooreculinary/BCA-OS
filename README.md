@@ -43,6 +43,23 @@ npm run build      # type-checks (tsc --noEmit) then builds to dist/
 npm run preview    # serve the production build
 ```
 
+## Deploy
+
+The app is a static build (`dist/`) plus one Gemini call, so any static host works.
+The Tool Finder needs `GEMINI_API_KEY` available **at build time** (Vite inlines it) —
+read the Security section below before deploying a public key.
+
+| Host | Steps | Notes |
+|------|-------|-------|
+| **Google AI Studio** | Open the project in AI Studio. | Key injected automatically; Tool Finder works, nothing to configure. |
+| **Vercel** | Import the repo. Set `GEMINI_API_KEY` env var. Deploy. | Vite is auto-detected. Real public URL. |
+| **Netlify** | Import the repo. Build `npm run build`, publish `dist`. Set `GEMINI_API_KEY`. | Same shape as Vercel. |
+| **GitHub Pages** | Settings → Pages → Source: **GitHub Actions**. Add repo secret `GEMINI_API_KEY`. Run the **Deploy to GitHub Pages** workflow (Actions tab → Run workflow). | Uses `.github/workflows/deploy-pages.yml`. Sets `VITE_BASE=/<repo>/` so assets resolve on the project site. |
+
+The Pages workflow is **manual-trigger only** (`workflow_dispatch`) — it never runs on
+a normal push. `vite.config.ts` reads `VITE_BASE` (default `/`) so the same build works
+at a domain root (Vercel/Netlify/AI Studio) or under `/<repo>/` (Pages).
+
 ## Structure
 
 ```

@@ -25,3 +25,16 @@ services:
     #   name: expo-os-vault
     #   mountPath: /var/data
     #   sizeGB: 1
+
+  - type: web
+    name: bca-os-blueprint-explorer
+    runtime: static
+    plan: free
+    rootDir: blueprint-explorer
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    autoDeployTrigger: commit
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

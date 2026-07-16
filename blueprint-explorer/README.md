@@ -41,14 +41,21 @@ npm run preview
 
 ## Deployment
 
+The explorer deploys beside BCA-OS from the same repository and root Render Blueprint. It remains a separate static service so the React/Vite frontend does not alter the Python runtime of the existing BCA-OS service.
+
 - **Repository:** `Cmooreculinary/BCA-OS`
 - **Target branch:** `feature/conrad-blueprint-explorer`
 - **Application directory:** `blueprint-explorer`
-- **Vercel framework preset:** Vite
-- **Vercel root directory:** `blueprint-explorer`
-- **Build command:** `npm run build`
-- **Output directory:** `dist`
+- **Render service:** `bca-os-blueprint-explorer`
+- **Render runtime:** static
+- **Render root directory:** `blueprint-explorer`
+- **Build command:** `npm ci && npm run build`
+- **Publish directory:** `dist`
+- **SPA route:** all paths rewrite to `/index.html`
 - **Environment variables:** none required for V1
+- **Expected Render URL:** `https://bca-os-blueprint-explorer.onrender.com` after the Blueprint creates the service; the final URL must be confirmed in Render.
+
+Vercel remains technically compatible, but Render is the selected deployment target for this branch.
 
 ## Architecture data
 

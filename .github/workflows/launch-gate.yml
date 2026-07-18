@@ -20,7 +20,13 @@ jobs:
           cache-dependency-path: mcp_bridge/requirements.txt
       - run: pip install -r mcp_bridge/requirements.txt pytest
       - run: python -m py_compile mcp_bridge/server.py mcp_bridge/app.py mcp_bridge/system_prompt.py
-      - run: pytest -q tests
+      - run: pytest -q tests --junitxml=pytest-results.xml
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: founder-test-results
+          path: pytest-results.xml
+          if-no-files-found: ignore
 
   blueprint-explorer:
     runs-on: ubuntu-latest

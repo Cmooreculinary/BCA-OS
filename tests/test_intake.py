@@ -1,14 +1,20 @@
 import json
+import os
 import unittest
 
 from fastapi.testclient import TestClient
 
-from mcp_bridge import server
+os.environ.setdefault("CONRAD_ACCESS_TOKEN", "founder-test-access")
+
+from mcp_bridge import app as production  # noqa: E402
+
+server = production.server
 
 
 class IntakeEndpointTests(unittest.TestCase):
     def setUp(self):
-        self.client = TestClient(server.app)
+        self.client = TestClient(production.app)
+        self.headers = {"Authorization": "Bearer founder-test-access"}
         self.records = []
         self.audit_records = []
         self.original_store = server.intake_store
@@ -38,7 +44,11 @@ class IntakeEndpointTests(unittest.TestCase):
         server.intake_read = self.original_read
 
     def post_intake(self, content):
-        response = self.client.post("/intake", json={"content": content})
+        response = self.client.post(
+            "/intake",
+            json={"content": content},
+            headers=self.headers,
+        )
         self.assertEqual(response.status_code, 200, response.text)
         return response.json()
 
@@ -111,11 +121,14 @@ class IntakeEndpointTests(unittest.TestCase):
     def test_recent_and_id_retrieval_routes_return_records(self):
         receipt = self.post_intake("Venue IQ should add a client-visible change summary.")
 
-        recent = self.client.get("/intake/recent")
+        recent = self.client.get("/intake/recent", headers=self.headers)
         self.assertEqual(recent.status_code, 200, recent.text)
         self.assertEqual(recent.json()["entries"][0]["intake_id"], receipt["intake_id"])
 
-        detail = self.client.get(f"/intake/{receipt['intake_id']}")
+        detail = self.client.get(
+            f"/intake/{receipt['intake_id']}",
+            headers=self.headers,
+        )
         self.assertEqual(detail.status_code, 200, detail.text)
         self.assertEqual(detail.json()["intake_id"], receipt["intake_id"])
 

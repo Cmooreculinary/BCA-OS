@@ -1,0 +1,59 @@
+name: Deploy to GitHub Pages
+
+# Manual trigger only — run it from the Actions tab when you want a public URL.
+# It does NOT run automatically on push, so normal commits stay quiet.
+#
+# Prerequisites (one-time):
+#   1. Repo Settings → Pages → Build and deployment → Source: "GitHub Actions".
+#   2. Repo Settings → Secrets and variables → Actions → add secret
+#      GEMINI_API_KEY. Use a RESTRICTED, quota-capped key you rotate regularly —
+#      a Pages build is static, so the key is embedded in the public bundle
+#      (see README "Security").
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment; don't cancel an in-progress run.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          # Serve assets from /<repo>/ on the Pages project site.
+          VITE_BASE: /${{ github.event.repository.name }}/
+        run: npm run build
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

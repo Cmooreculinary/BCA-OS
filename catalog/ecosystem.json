@@ -1,0 +1,213 @@
+{
+  "schema_version": "2026-07-07",
+  "owner": "Blue Collar Apps Co.",
+  "canonical_source": "BCA-OS",
+  "public_surface": "Blue-Collar-Apps-Founders",
+  "retired_surface": "Blue-Collar-Appz",
+  "operating_system": {
+    "name": "BC SOS / BCA OS",
+    "role": "Founder-controlled operating system for the Blue Collar Apps ecosystem.",
+    "children": [
+      "Conrad / EXPO",
+      "Professional Suite",
+      "Life Management",
+      "Consumer / Dusk Hub",
+      "Platform & Agents",
+      "Standalone Agents"
+    ],
+    "capabilities": [
+      "Founder intake routing",
+      "Policy and launch-gate enforcement",
+      "Hybrid memory",
+      "Credit ledger",
+      "Local LLM routing",
+      "App and agent fleet orchestration"
+    ]
+  },
+  "apps": [
+    {
+      "name": "FootTruck Apollo",
+      "lane": "Professional Suite",
+      "status": "LIVE",
+      "tagline": "The Food Truck Launch Pad",
+      "revenue": "$29/mo Basic, $79/mo Pro. The Foundry $99 custom-shop tier.",
+      "field_note": "Live now plus Render backend. First monetization track."
+    },
+    {
+      "name": "Captain Culinary Pro Hub",
+      "lane": "Professional Suite",
+      "status": "LIVE",
+      "tagline": "The OS for Culinary Professionals",
+      "revenue": "$19/mo Explorer, $49/mo Professional, $199/mo Enterprise.",
+      "field_note": "Professional culinary career and progression platform."
+    },
+    {
+      "name": "Captain Culinary Kids",
+      "lane": "Professional Suite",
+      "status": "ACTIVE DEV",
+      "tagline": "Cook Like a Pro, Kid",
+      "revenue": "Family tiers; faith-community and school site licensing; grant-funded seats.",
+      "field_note": "Launch gates: COPPA, parental consent, safe on-device fallback."
+    },
+    {
+      "name": "Restaurateur Pro",
+      "lane": "Professional Suite",
+      "status": "IN DEVELOPMENT",
+      "tagline": "Scale With Confidence",
+      "revenue": "$99/mo Single-Unit, $299/mo Multi-Unit, custom enterprise.",
+      "field_note": "Concept and expansion toolkit absorbed into one operator platform."
+    },
+    {
+      "name": "Margin IQ",
+      "lane": "Professional Suite",
+      "status": "LIVE",
+      "tagline": "Profit Intelligence. Operational Excellence.",
+      "revenue": "$49/mo Single-Unit, $149/mo Multi-Unit, custom enterprise.",
+      "field_note": "Live now at margin-iq.onrender.com. Pairs with Restaurateur Pro planning."
+    },
+    {
+      "name": "Hotel / Resort Developer",
+      "lane": "Professional Suite",
+      "status": "CONCEPT",
+      "tagline": "From Napkin Sketch to Investor Handshake",
+      "revenue": "Tiered subscription; enterprise advisory licensing.",
+      "field_note": "Concept lane; build slot follows live-product scale."
+    },
+    {
+      "name": "AllergenShield",
+      "lane": "Professional Suite",
+      "status": "ARCHITECTURE",
+      "tagline": "Zero Doubt. Zero Cross-Contact.",
+      "revenue": "Per-location subscription; enterprise multi-unit licensing.",
+      "field_note": "Launch gates: liability opinion and product insurance before launch."
+    },
+    {
+      "name": "Venue IQ",
+      "lane": "Professional Suite",
+      "status": "NEW / DEMO",
+      "tagline": "Know Your Room",
+      "revenue": "Per-venue subscription; multi-property tiers.",
+      "field_note": "Redesign in motion; ships to its own repo."
+    },
+    {
+      "name": "Maestro",
+      "lane": "Life Management",
+      "status": "LIVE",
+      "tagline": "Your Command Center for Life",
+      "revenue": "$9.99/mo Individual, $19.99/mo Family; VaultSpace bundle $29.99/mo.",
+      "field_note": "Pairs with VaultSpace as the Life Management suite."
+    },
+    {
+      "name": "VaultSpace",
+      "lane": "Life Management",
+      "status": "LIVE",
+      "tagline": "Military-Grade Security for Life's Important Things",
+      "revenue": "$7.99/mo Individual, $14.99/mo Family; Maestro bundle $29.99/mo.",
+      "field_note": "Also serves as Conrad's runtime memory store inside EXPO OS."
+    },
+    {
+      "name": "Dusk",
+      "lane": "Consumer / Dusk Hub",
+      "status": "IN DEVELOPMENT",
+      "tagline": "Your City, Tonight",
+      "revenue": "Freemium plus featured listings, booking commissions, and bundle fees.",
+      "field_note": "City-by-city launch; Nashville first, then Miami, Austin, NYC."
+    },
+    {
+      "name": "Fusebox",
+      "lane": "Consumer / Dusk Hub",
+      "status": "LIVE",
+      "tagline": "Where Cuisines Collide",
+      "revenue": "$9.99/mo Home, $29.99/mo Professional.",
+      "field_note": "Live; 2.0 elevation in progress."
+    },
+    {
+      "name": "Round Table",
+      "lane": "Consumer / Dusk Hub",
+      "status": "ACTIVE BUILD",
+      "tagline": "Your Crew, On Channel",
+      "revenue": "Freemium; premium venue tiers; organizer tools.",
+      "field_note": "Iteration 18+. Gate: A2P 10DLC and TCPA consent before SMS features."
+    },
+    {
+      "name": "Vine & Barrel",
+      "lane": "Consumer / Dusk Hub",
+      "status": "V5 IN PROGRESS",
+      "tagline": "America's Premier Tasting Platform",
+      "revenue": "Tasting-kit sales, event tickets, memberships, winery partnerships.",
+      "field_note": "Home of the Foxhounds Wine & Craft Beer Social club."
+    },
+    {
+      "name": "Plate Me",
+      "lane": "Consumer / Dusk Hub",
+      "status": "IN DEVELOPMENT",
+      "tagline": "Eat With Your Eyes First",
+      "revenue": "$7.99/mo Basic, $19.99/mo Pro with live consults.",
+      "field_note": "Visual-first; the camera is the input, the plate is the proof."
+    },
+    {
+      "name": "PubHub",
+      "lane": "Consumer / Dusk Hub",
+      "status": "CONCEPT",
+      "tagline": "Find Your Pub. Find Your People.",
+      "revenue": "Pub listing subscriptions, event-promotion fees, premium features.",
+      "field_note": "Concept lane; natural neighbor to Dusk and Round Table."
+    },
+    {
+      "name": "Valet Captain",
+      "lane": "Consumer / Dusk Hub",
+      "status": "CONCEPT",
+      "tagline": "The Future of Valet",
+      "revenue": "Valet company subscriptions, transaction fees, insurance commission.",
+      "field_note": "Concept lane; pairs with Dusk's VIP Night Builder."
+    },
+    {
+      "name": "EXPO OS + Conrad",
+      "lane": "Platform & Agents",
+      "status": "ARCHITECTURE",
+      "tagline": "The Brain Behind Blue Collar Apps",
+      "revenue": "Internal platform; powers every product in the portfolio.",
+      "field_note": "Conrad is the expediter; information flows through him to where it is needed."
+    },
+    {
+      "name": "BrainForge",
+      "lane": "Platform & Agents",
+      "status": "ARCHITECTURE",
+      "tagline": "Where the Agents Are Built",
+      "revenue": "Internal platform; the assembly line for new agents.",
+      "field_note": "Feeds the standalone agent fleet that rides the operator's belt."
+    }
+  ],
+  "agents": [
+    {
+      "name": "Permit Pilot",
+      "tagline": "Permits, On Autopilot",
+      "best_for": "Operators drowning in licensing red tape."
+    },
+    {
+      "name": "Health Inspector Prep",
+      "tagline": "Pass Before They Knock",
+      "best_for": "Kitchens that cannot afford a failed inspection."
+    },
+    {
+      "name": "Cost Sentinel",
+      "tagline": "Watches Every Dollar on the Line",
+      "best_for": "Operators guarding food cost and margin."
+    },
+    {
+      "name": "Cap",
+      "tagline": "Your Robot Chef, On Call",
+      "best_for": "Home cooks and students learning the craft."
+    },
+    {
+      "name": "Sommelier Agent",
+      "tagline": "Pairing, Without the Pretense",
+      "best_for": "Tables, tastings, and curious drinkers."
+    },
+    {
+      "name": "Catering Captain",
+      "tagline": "Every Event, Buttoned Up",
+      "best_for": "Caterers, private chefs, and event venues."
+    }
+  ]
+}

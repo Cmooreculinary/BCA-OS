@@ -33,7 +33,7 @@ services:
     runtime: static
     plan: free
     rootDir: blueprint-explorer
-    buildCommand: npm ci && npm run build
+    buildCommand: npm install && npm run build
     staticPublishPath: ./dist
     autoDeployTrigger: commit
     routes:

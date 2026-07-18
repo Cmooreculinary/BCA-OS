@@ -1,0 +1,38 @@
+name: Launch Gate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  founder-service:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: mcp_bridge/requirements.txt
+      - run: pip install -r mcp_bridge/requirements.txt pytest
+      - run: python -m py_compile mcp_bridge/server.py mcp_bridge/app.py mcp_bridge/system_prompt.py
+      - run: pytest -q tests
+
+  blueprint-explorer:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: blueprint-explorer
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: blueprint-explorer/package-lock.json
+      - run: npm ci
+      - run: npm run build

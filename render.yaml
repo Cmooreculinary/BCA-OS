@@ -4,11 +4,13 @@ services:
     runtime: python
     plan: starter
     buildCommand: pip install -r mcp_bridge/requirements.txt
-    startCommand: uvicorn mcp_bridge.server:app --host 0.0.0.0 --port $PORT
+    startCommand: uvicorn mcp_bridge.app:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     envVars:
       - key: PYTHON_VERSION
         value: "3.12.7"
+      - key: CONRAD_ACCESS_TOKEN
+        sync: false
       - key: GOOGLE_API_KEY
         sync: false
       - key: NOTEBOOKLM_NOTEBOOK_ID
@@ -31,7 +33,7 @@ services:
     runtime: static
     plan: free
     rootDir: blueprint-explorer
-    buildCommand: npm ci && npm run build
+    buildCommand: npm install && npm run build
     staticPublishPath: ./dist
     autoDeployTrigger: commit
     routes:

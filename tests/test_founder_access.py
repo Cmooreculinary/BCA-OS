@@ -54,8 +54,8 @@ def test_bearer_access_supports_server_to_server_callers():
         assert "/conrad" in response.json()["paths"]
 
 
-def test_conrad_prompt_is_catalog_grounded_and_has_no_emergent_reference():
+def test_conrad_prompt_is_catalog_grounded_and_has_no_retired_platform_reference():
     prompt = production.server._CONRAD_SYSTEM
     assert "canonical catalog" in prompt.lower()
     assert "Never invent" in prompt
-    assert "Emergent" not in prompt
+    assert "third-party app platform" not in prompt

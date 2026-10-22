@@ -7,7 +7,7 @@
 - [x] C — MCP Bridge to SmartVaultSpace: working MCP connection Conrad → NotebookLM Galaxy (read/query) + SQLite VaultSpace (write); source-grounded answer with citation
 - [x] D — The n8n Loop Runner: one n8n workflow — trigger → Conrad queries Galaxy → acts → writes vaultspace collection → appends memory.md, unattended
 - [x] E — Teacher Routing Config: routing.md mapping task-type → model (Haiku / Sonnet / Opus ladder)
-- [ ] F — BCA Universal User Shell: full product spec + implementation plan + task board; 3 new planning files created (Spec, Plan, Tasks); awaiting Founder + Teacher approval (Phase 0 gate) before any implementation begins
+- [x] F — BCA Universal User Shell: retired Oct 20, 2026 in the consolidation; planning docs removed. Do not recreate.
 
 ## Phase 1 — Conrad Intake and Memory Routing
 

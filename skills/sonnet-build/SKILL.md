@@ -5,11 +5,12 @@ description: Build something with the strong-plan, cheap-build split — a top m
 
 # Plan strong, build cheap
 
-**Goal:** excellent work at the lowest cost. Follows `routing.md`.
+**Goal:** excellent work at the lowest cost.
 
 ## Rules
-- Top model (Opus/Fable or equivalent): plan, architecture, final check. Never routine wiring.
-- Builder model (Sonnet/Haiku or equivalent): the building.
+- **Pick every model from `routing.md`.** It is the only model list; it says which rung plans, which builds, and which models are paused. Don't name models anywhere else.
+- Top rung: plan, architecture, final check. Never routine wiring.
+- Builder rung: the building. Never give a builder secrets.
 - Chef sees only checked work.
 
 ## Steps
